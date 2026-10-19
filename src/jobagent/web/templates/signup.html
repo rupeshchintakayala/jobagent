@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block body %}
+<div class="card" style="max-width:420px;margin:auto"><h1>Create account</h1>
+{% if error %}<div class="flash err">{{ error }}</div>{% endif %}
+<form method="post" action="/signup"><label>Email</label><input type="email" name="email" value="{{ email or '' }}" required autofocus>
+<label>Password <span class="mut">(10+ characters)</span></label><input type="password" name="password" minlength="10" required>
+{% if needs_invite %}<label>Invite code</label><input name="invite" required autocomplete="off">{% endif %}
+<p><button class="btn">Sign up</button></p></form><p class="mut">Already registered? <a href="/login">Log in</a></p></div>
+{% endblock %}

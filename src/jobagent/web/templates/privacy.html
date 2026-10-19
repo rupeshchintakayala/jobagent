@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h1>Your data</h1>
+<p>We store: your email, a password hash, your encrypted API key, your profile versions, job matches, drafts and usage counts. Your CV file itself is not kept, only the text profile you confirmed. Your API key is never sent anywhere except to Claude.</p></div>
+<div class="card"><h2>Delete everything</h2><p>Permanently removes your account, key, profiles, drafts and history. This cannot be undone.</p>
+<form method="post" action="/privacy/delete"><input type="hidden" name="csrf" value="{{ csrf }}"><label>Type DELETE to confirm</label><input name="confirm" autocomplete="off">
+<p><button class="btn bad">Delete my account and data</button></p></form></div>
+{% endblock %}

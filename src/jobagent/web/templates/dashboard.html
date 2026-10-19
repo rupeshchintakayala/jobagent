@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% block body %}
+{% if not (s.has_key and s.confirmed) %}
+<div class="card"><h1>Get set up</h1>
+<ul class="steps">
+<li><span class="dot {{ 'done' if s.has_key }}">{{ '✓' if s.has_key else '1' }}</span><div style="flex:1"><b>Add your Claude API key</b><div class="mut">You pay Anthropic directly; we cap your spend.</div></div>{% if not s.has_key %}<a class="btn" href="/settings">Add key</a>{% endif %}</li>
+<li><span class="dot {{ 'done' if s.has_draft }}">{{ '✓' if s.has_draft else '2' }}</span><div style="flex:1"><b>Upload your CV</b><div class="mut">PDF, Word or text. We turn it into a profile draft.</div></div>{% if s.has_key and not s.has_draft %}<a class="btn" href="/profile">Upload CV</a>{% endif %}</li>
+<li><span class="dot {{ 'done' if s.confirmed }}">{{ '✓' if s.confirmed else '3' }}</span><div style="flex:1"><b>Check and confirm your profile</b><div class="mut">Only facts you confirm are ever used in applications.</div></div>{% if s.draft_pending %}<a class="btn" href="/profile">Review</a>{% endif %}</li>
+</ul></div>
+{% endif %}
+<div class="card"><h2>Today</h2>
+{% if run and run.state == 'running' %}<p><span class="pill warn">Running</span> {{ run.msg }}</p><p class="mut">Refresh this page in a minute.</p><a class="btn sec" href="/dashboard">Refresh</a>
+{% else %}
+{% if run %}<p><span class="pill {{ 'good' if run.state=='done' else 'bad' }}">{{ 'Last run finished' if run.state=='done' else 'Last run failed' }}</span> {{ run.msg }}</p>{% endif %}
+<form method="post" action="/run"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn" {{ 'disabled' if not (s.has_key and s.confirmed) }}>Find jobs now</button>
+<span class="mut" style="margin-left:8px"> Dry run: it only drafts. Nothing is sent anywhere.</span></form>{% endif %}</div>
+<div class="grid" style="margin-bottom:16px">
+<a class="stat" href="/queue?status=drafted"><b>{{ counts.drafted }}</b>to review</a>
+<a class="stat" href="/queue?status=approved"><b>{{ counts.approved }}</b>approved</a>
+<a class="stat" href="/queue?status=submitted"><b>{{ counts.submitted }}</b>applied</a>
+<a class="stat" href="/queue?status=rejected"><b>{{ counts.rejected }}</b>rejected</a></div>
+{% if s.has_key %}<div class="card"><h2>API spend this month</h2>
+<div class="bar {{ 'hot' if pct > 80 }}"><i style="width:{{ pct }}%"></i></div>
+<p class="mut">€{{ '%.2f' % s.spent }} of €{{ '%.2f' % s.cap }} cap</p></div>{% endif %}
+{% endblock %}

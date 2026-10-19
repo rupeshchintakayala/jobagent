@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h1>Claude API key</h1>
+{% if key %}<p><span class="pill good">Saved</span> <code>{{ masked }}</code> · cap €{{ '%.2f' % key.monthly_cap_eur }}/month</p>{% endif %}
+<p class="mut">Get a key at console.anthropic.com. It's encrypted on our server and never shown again. You pay Anthropic directly; usage stops at your cap.</p>
+<form method="post" action="/settings/key"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>{{ 'Replace key' if key else 'API key' }}</label><input type="password" name="api_key" placeholder="sk-ant-..." required autocomplete="off">
+<label>Monthly cap (€)</label><input type="number" name="cap_eur" value="{{ '%.0f' % key.monthly_cap_eur if key else 15 }}" min="1" max="500" step="1">
+<p><button class="btn">Verify and save</button></p></form></div>
+<div class="card"><h1>Search preferences</h1>
+<form method="post" action="/settings/prefs"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Minimum salary (€/year)</label><input type="number" name="min_salary_eur" value="{{ prefs.min_salary_eur }}" min="0" step="1000">
+<label>Minimum match score (0-100)</label><input type="number" name="min_score" value="{{ prefs.min_score }}" min="0" max="100">
+<p class="mut">Jobs with no published salary are shown separately, not dropped.</p><p><button class="btn">Save</button></p></form></div>
+<div class="card"><h2>Privacy</h2><p><a href="/privacy">Download-free, one-click data deletion →</a></p></div>
+{% endblock %}

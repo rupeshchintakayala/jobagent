@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><div class="row"><div style="flex:1"><h1 style="margin:0">{{ a.title }}</h1><div class="mut">{{ a.company }} · {{ a.location }} · <span class="pill">{{ a.status }}</span></div></div>
+{% if m %}<div class="score">{{ m.score }}</div>{% endif %}</div>
+<p><a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">Open the job posting ↗</a></p>
+{% if q.remaining is not none %}<p><span class="pill {{ 'warn' if q.remaining <= 1 else 'good' }}">{{ q.remaining }} of {{ max }} applications left at {{ a.company }}</span></p>{% endif %}
+{% if not q.allowed %}<p style="color:var(--bad)">⛔ {{ q.reason }}</p>{% endif %}
+{% if m and m.reasons %}<div>✔ {{ m.reasons|join(' · ') }}</div>{% endif %}{% if m and m.red_flags %}<div style="color:var(--warn)">⚠ {{ m.red_flags|join(' · ') }}</div>{% endif %}</div>
+<div class="card"><h2>Tailored CV</h2><pre>{{ a.cv_text }}</pre><h2>Cover letter</h2><pre>{{ a.letter_text }}</pre>
+<p class="mut">Every claim above was checked against your confirmed profile. Still read it before you apply.</p></div>
+<div class="card row">
+{% if a.status == 'drafted' %}<form method="post" action="/application/{{ a.id }}/approve"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn ok" {{ 'disabled' if not q.allowed }}>Approve</button></form>{% endif %}
+{% if a.status == 'approved' %}<form method="post" action="/application/{{ a.id }}/applied"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn">I applied</button></form>{% endif %}
+{% if a.status in ('drafted','approved') %}<form method="post" action="/application/{{ a.id }}/reject"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn bad">Reject</button></form>{% endif %}
+<a class="btn sec" href="/queue">Back</a></div>
+{% if a.status == 'drafted' %}<p class="mut">Approving doesn't send anything. It reserves one of your applications at this company. You then apply yourself on their site and click “I applied”.</p>{% endif %}
+{% endblock %}

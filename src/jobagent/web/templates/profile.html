@@ -1,0 +1,42 @@
+{% extends "base.html" %}{% block body %}
+{% if not row %}
+<div class="card"><h1>Upload your CV</h1>
+{% if not has_key %}<p>Add your <a href="/settings">Claude key</a> first.</p>{% else %}
+<p class="mut">PDF, Word (.docx) or text, up to 5 MB. It takes about 20 seconds.</p>
+<form method="post" action="/profile/upload" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{ csrf }}">
+<input type="file" name="cv" accept=".pdf,.docx,.txt,.md" required><p><button class="btn">Read my CV</button></p></form>{% endif %}</div>
+{% else %}
+{% set locked = row.confirmed_at is not none %}
+<div class="card"><h1>Your profile <span class="pill {{ 'good' if locked else 'warn' }}">v{{ row.version }} · {{ 'confirmed' if locked else 'draft: needs your check' }}</span></h1>
+{% if locked %}<p>This version is confirmed and in use. To change anything, make a new draft.</p>
+<form method="post" action="/profile/new-version"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn sec">Edit (creates new draft)</button></form>
+{% else %}<p><b>Check every line.</b> The AI may have misread your CV. Whatever you confirm here is the only source of truth for your applications.</p>{% endif %}</div>
+<form method="post" action="/profile/save"><input type="hidden" name="csrf" value="{{ csrf }}">
+<fieldset {{ 'disabled' if locked }} style="border:0;padding:0;margin:0">
+<div class="card"><h2>About you</h2>
+<label>Name</label><input name="name" value="{{ p.name }}"><label>Email</label><input name="email" value="{{ p.email }}">
+<label>Phone</label><input name="phone" value="{{ p.phone }}"><label>Location</label><input name="location" value="{{ p.location }}">
+<label>Headline</label><input name="headline" value="{{ p.headline }}"><label>Summary</label><textarea name="summary">{{ p.summary }}</textarea>
+<label>Work authorization <span class="mut">(e.g. Irish citizen, Stamp 1G, Critical Skills permit)</span></label><input name="work_authorization" value="{{ p.work_authorization }}">
+<label>Years of experience</label><input name="years_experience" value="{{ p.years_experience if p.years_experience is not none else '' }}">
+<label>Target roles <span class="mut">(one per line)</span></label><textarea name="target_roles">{{ p.target_roles|join('\n') }}</textarea>
+<label>Skills <span class="mut">(one per line)</span></label><textarea name="skills">{{ p.skills|join('\n') }}</textarea></div>
+{% for e in p.experience %}<div class="card"><h2>Experience {{ loop.index }}</h2>
+<label>Company</label><input name="exp{{ loop.index0 }}_company" value="{{ e.company }}"><label>Title</label><input name="exp{{ loop.index0 }}_title" value="{{ e.title }}">
+<div class="row"><div style="flex:1"><label>Start</label><input name="exp{{ loop.index0 }}_start" value="{{ e.start }}"></div><div style="flex:1"><label>End</label><input name="exp{{ loop.index0 }}_end" value="{{ e.end }}"></div></div>
+<label>Summary</label><textarea name="exp{{ loop.index0 }}_summary">{{ e.summary }}</textarea>
+<label>Achievements <span class="mut">(one per line; keep numbers exact)</span></label><textarea name="exp{{ loop.index0 }}_achievements">{{ e.achievements|join('\n') }}</textarea>
+<label>Technologies <span class="mut">(one per line)</span></label><textarea name="exp{{ loop.index0 }}_technologies">{{ e.technologies|join('\n') }}</textarea></div>{% endfor %}
+{% for ed in p.education %}<div class="card"><h2>Education {{ loop.index }}</h2>
+<label>Institution</label><input name="edu{{ loop.index0 }}_institution" value="{{ ed.institution }}"><label>Degree</label><input name="edu{{ loop.index0 }}_degree" value="{{ ed.degree }}">
+<label>Field</label><input name="edu{{ loop.index0 }}_field" value="{{ ed.field }}"><label>Year</label><input name="edu{{ loop.index0 }}_year" value="{{ ed.year }}"></div>{% endfor %}
+<div class="card"><h2>Other</h2><label>Certifications <span class="mut">(one per line)</span></label><textarea name="certifications">{{ p.certifications|join('\n') }}</textarea>
+<label>Languages</label><textarea name="languages">{{ p.languages|join('\n') }}</textarea><label>Links</label><textarea name="links">{{ p.links|join('\n') }}</textarea></div>
+</fieldset>
+{% if not locked %}<div class="card row"><button class="btn sec" name="action" value="save">Save draft</button>
+<button class="btn ok" name="action" value="confirm">I've checked it: confirm profile</button></div>{% endif %}
+</form>
+{% if locked %}<div class="card"><h2>Replace with a new CV</h2><form method="post" action="/profile/upload" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{ csrf }}">
+<input type="file" name="cv" accept=".pdf,.docx,.txt,.md" required><p><button class="btn sec">Upload and create new draft</button></p></form></div>{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block body %}
+<div class="row" style="margin-bottom:12px">{% for s,l in [('drafted','To review'),('approved','Approved'),('submitted','Applied'),('rejected','Rejected')] %}
+<a class="btn {{ '' if status==s else 'sec' }}" href="/queue?status={{ s }}">{{ l }}</a>{% endfor %}</div>
+{% for i in items %}<div class="card"><div class="row"><div style="flex:1"><h2 style="margin:0"><a href="/application/{{ i.a.id }}" style="color:inherit">{{ i.a.title }}</a></h2>
+<div class="mut">{{ i.a.company }}</div></div>{% if i.score is not none %}<div class="score">{{ i.score }}</div>{% endif %}</div>
+<p>{% if i.remaining is not none %}<span class="pill {{ 'warn' if i.remaining <= 1 else 'good' }}">{{ i.remaining }} of {{ i.max }} applications left at {{ i.a.company }}</span>{% endif %}</p>
+{% if i.reasons %}<div>✔ {{ i.reasons|join(' · ') }}</div>{% endif %}{% if i.flags %}<div style="color:var(--warn)">⚠ {{ i.flags|join(' · ') }}</div>{% endif %}
+<p><a class="btn sec" href="/application/{{ i.a.id }}">Open</a></p></div>
+{% else %}<div class="card"><p>Nothing here{% if status == 'drafted' %}. Run <a href="/dashboard">Find jobs now</a> from the home page{% endif %}.</p></div>{% endfor %}
+{% endblock %}

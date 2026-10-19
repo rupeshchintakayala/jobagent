@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h1>Company application limits</h1>
+<p class="mut">Some companies cap how many times you can apply (for example 5, then a 6-month lockout). Unknown companies default to <b>3</b> to be safe. Only enter limits you have read on the company's careers page.</p>
+<form method="post" action="/policies"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Company</label><input name="company" required>
+<div class="row"><div style="flex:1"><label>Max applications <span class="mut">(empty = no limit)</span></label><input name="max_applications" inputmode="numeric"></div>
+<div style="flex:1"><label>Window (days)</label><input name="window_days" type="number" value="180"></div></div>
+<label>Source <span class="mut">(e.g. careers page URL)</span></label><input name="note">
+<p><button class="btn">Save limit</button></p></form></div>
+<div class="card"><h2>Known companies</h2>
+{% for r in rows %}<div class="row" style="padding:6px 0;border-bottom:1px solid var(--line)"><b style="flex:1">{{ r.name }}</b>
+{% if r.window_days is none %}<span class="pill">unknown · default 3</span>{% elif r.max_applications is none %}<span class="pill good">no limit</span>{% else %}<span class="pill warn">{{ r.max_applications }} per {{ r.window_days }}d</span>{% endif %}</div>
+{% else %}<p class="mut">No companies yet. They appear after the first search.</p>{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block body %}
+<div class="card" style="max-width:420px;margin:auto"><h1>Log in</h1>
+{% if error %}<div class="flash err">{{ error }}</div>{% endif %}
+<form method="post" action="/login"><label>Email</label><input type="email" name="email" value="{{ email or '' }}" required autofocus>
+<label>Password</label><input type="password" name="password" required>
+<p><button class="btn">Log in</button></p></form><p class="mut">New here? <a href="/signup">Create an account</a></p></div>
+{% endblock %}
